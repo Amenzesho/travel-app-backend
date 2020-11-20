@@ -1,65 +1,110 @@
-const express = require ('express');
-const bodyParser = require ('body-parser')
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const myPlaintextPassword = 's0/\/\P4$$w0rD';
-const someOtherPlaintextPassword = 'not_bacon';
+const express = require('express')
+const bcrypt = require('bcryptjs')
+const salt = bcrypt.genSaltSync(10);
 
-const app =   express()
+const app = express()
 
+app.use(express.json())
 
-app.use(bodyParser.json())
-
-const database = { 
-    users: [
-        {
-            id: 123,
-            name: "peter",
-            password: '123'
-    }
-    ]}
-
-app.get('/', (req,res)=>{
-    res.json(database.users)
-})
-
-app.post('/register', (req,res)=>{
-    console.log(req.body)
-    const {password,hobby,name} = req.body
-    bcrypt.hash(password, saltRounds, function(err, hash) {
-        console.log(hash)
-        // Store hash in your password DB.
-        database.users.push({
-            name:name,
-            password:hash,
-            hobby: hobby,
-            joined: new Date()    
-        })
-        res.json(hobby)
-
-    });
-    
-})
-
-app.post('/signin', (req,res)=>{
-    const { name, password} = req.body
-    let found = false
-    database.users.forEach((user)=> {
-if (name === user.name) {
-    const isFound = bcrypt.compareSync(password, user.password); 
-    found = isFound
-    if(found){
-        res.json(user)
-    }
-    
+const database = {
+    users: [{
+        id: "120",
+        name: "Sally",
+        hobby: "socccer",
+        entries:0,
+        joined: new Date()
+    }  
+ ], 
+    login: [{
+        id: "120",
+        email: "sally@gmail.com",
+        password: "hash"
+    }        
+    ]
 }
+   
+
+
+app.get('/', (req, res)=>{
+    res.send('<h1>Server is runing Well on Amazing Cloud')
+})
+
+
+app.post('/signin',(req,res)=>{
+const {password, id, email } = req.body
+    if ( !email ||  !password) {
+        return res.status(400).json('incorrect form submission')
+}
+let found  = false
+    database.login.forEach((user,i)=>{
+     if (user.email === email) {
+        const isFound = bcrypt.compareSync(password, user.password);
+        found = isFound
+        if(found) {
+            res.status(200).json(database.users[i])
+    } 
+}
+})
+if(!found) {
+    res.status(400).json('unable to log on')
+}
+})
+app.get('/about',(req,res)=>{
+    res.send("<h1>I am about</h1>")
+})
+
+app.post('/register',(req,res)=>{
+    const {name, password, email,} = req.body
+    if (!name, !email ||  !password) {
+        return res.status(400).json('incorrect form submission')
+}
+    const hash = bcrypt.hashSync(password, salt);
+    database.users.push({
+        id:`${database.users.length+125}`,
+        name: name,
+        email:email,
+        entries:0,
+        joined: new Date()
+    } )
+    database.login.push({
+        id:`${database.users.length+125}`,
+        email:email,
+        password:hash,
     })
-if (!found){
-    res.json("Bad Credentials")
-}
+     res.json(database.users[database.users.length-1])
+ })
 
+app.get('/profile/:id', (req,res)=>{
+    const {id} = req.params;
+      let found = false
+      database.users.forEach((user)=>{
+        if(user.id === id) {
+            found = true
+            return res.json(user)
+        } 
+    })
+    if(!found){
+        res.status(400).json('no such user')
+    }
 })
 
-app.listen(3000,()=> {
-    console.log('server running')
+app.put('/booked', (req,res)=>{
+    const {id} = req.body;
+    let found = false
+      database.users.forEach((user)=>{
+        if(user.id === id) {
+           user.entries ++
+            found = true
+            return res.json(user.entries)
+        } 
+    })
+    if(!found){
+        res.status(400).json('no such user')
+    }
+})
+
+let port = process.env.PORT || 3000
+
+app.listen(port, ()=>{
+    console.log('server running on '+ port)
 })
