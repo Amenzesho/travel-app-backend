@@ -1,10 +1,12 @@
 const express = require('express')
 const bcrypt = require('bcryptjs')
 const salt = bcrypt.genSaltSync(10);
+const cors = require('cors')
 
 const app = express()
 
 app.use(express.json())
+app.use(cors())
 
 const database = {
     users: [{
@@ -46,6 +48,7 @@ app.post('/questions', (req, res)=>{
 
 app.post('/signin',(req,res)=>{
 const {password, id, email } = req.body
+console.log(password, email)
     if ( !email ||  !password) {
         return res.status(400).json('incorrect form submission')
 }
@@ -69,6 +72,7 @@ app.get('/about',(req,res)=>{
 
 app.post('/register',(req,res)=>{
     const {name, password, email,} = req.body
+    console.log(name, email, password)
     if (!name, !email ||  !password) {
         return res.status(400).json('incorrect form submission')
 }
