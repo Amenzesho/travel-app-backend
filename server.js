@@ -20,15 +20,29 @@ const database = {
         email: "sally@gmail.com",
         password: "hash"
     }        
-    ]
+    ],
+    destinations: {
+        Adventurous: "Banff",
+        Relaxing: "Lake louise",
+        Exciting: "Canmore"
+    }
 }
-   
-
 
 app.get('/', (req, res)=>{
     res.send('<h1>Server is runing Well on Amazing Cloud')
 })
 
+
+app.post('/questions', (req, res)=>{
+    let personality = req.body.personality
+    let destination;
+    for (const [key, value] of Object.entries(database.destinations)) {
+        if (personality === key) {
+            destination = value;
+        }
+    }
+    res.send(destination)
+})
 
 app.post('/signin',(req,res)=>{
 const {password, id, email } = req.body
