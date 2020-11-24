@@ -26,7 +26,9 @@ const database = {
     destinations: {
         Adventurous: "Banff",
         Relaxing: "Lake louise",
-        Exciting: "Canmore"
+        Spiritual: "Canmore",
+        Traditional: "China town",
+        Spontaneous: "Lake slyvan"
     }
 }
 
@@ -38,12 +40,17 @@ app.get('/', (req, res)=>{
 app.post('/questions', (req, res)=>{
     let personality = req.body.personality
     let destination;
+    console.log(personality)
     for (const [key, value] of Object.entries(database.destinations)) {
         if (personality === key) {
             destination = value;
         }
     }
-    res.send(destination)
+    if (destination === undefined) {
+        res.json('error!!')
+    } else {
+        res.json(destination)
+    }
 })
 
 app.post('/signin',(req,res)=>{
