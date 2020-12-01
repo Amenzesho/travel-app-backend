@@ -25,10 +25,10 @@ const database = {
     ],
     destinations: {
         Adventurous: "Banff",
-        Relaxing: "Lake Louise",
+        Relaxing: "Lake-Louise",
         Spiritual: "Canmore",
-        Traditional: "China town",
-        Spontaneous: "Sylvan Lake"
+        Traditional: "Edmonton",
+        Spontaneous: "Sylvan-Lake"
     }
 }
 
