@@ -89,7 +89,7 @@ app.post('/register',(req,res)=>{
         name: name,
         email:email,
         entries:0,
-        joined: new Date()
+        joined: new Date().toDateString()
     } )
     database.login.push({
         id:`${database.users.length+125}`,
